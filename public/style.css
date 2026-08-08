@@ -1,0 +1,385 @@
+/* ============================================
+   DESIGN TOKENS
+   ============================================ */
+:root {
+  --bg-page: #110E15;
+  --bg-panel: #211720;
+  --border-subtle: #411D2B;
+  --accent: #430E18;
+  --accent-hover: #2A0A11;
+  --accent-glow: #7a2536;
+
+  --text-primary: #F3EAE7;
+  --text-secondary: #A8909A;
+  --text-muted: #6E5C66;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.site-header {
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 20px 0;
+}
+
+.header-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  padding: 72px 24px 56px;
+  position: relative;
+  overflow: hidden;
+  /* subtle diagonal glow reminiscent of the reference image */
+  background: linear-gradient(115deg, transparent 40%, rgba(122, 37, 54, 0.15) 50%, transparent 60%);
+}
+
+.hero-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-glow);
+  margin-bottom: 16px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+
+.hero-sub {
+  color: var(--text-secondary);
+  font-size: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   EVENTS GRID
+   ============================================ */
+.events-section {
+  padding: 48px 24px 96px;
+}
+
+.events-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.status-msg {
+  color: var(--text-secondary);
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* ============================================
+   EVENT CARD
+   ============================================ */
+.event-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.event-card:hover {
+  border-color: var(--accent-glow);
+}
+
+.event-date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent-glow);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.event-title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 500;
+  margin: 4px 0;
+}
+
+.event-desc {
+  color: var(--text-secondary);
+  font-size: 14px;
+  flex-grow: 1;
+}
+
+.event-location {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Capacity bar — the signature element: glowing "seats filling up" indicator */
+.capacity-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.capacity-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+  box-shadow: 0 0 8px var(--accent-glow);
+  transition: width 0.4s ease;
+}
+
+.capacity-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--text-primary);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-glow);
+}
+
+.btn-danger {
+  background: transparent;
+  color: #d4626f;
+  border: 1px solid var(--border-subtle);
+  font-size: 13px;
+  padding: 6px 14px;
+}
+
+.btn-danger:hover {
+  border-color: #d4626f;
+}
+
+.btn-full {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* ============================================
+   MODALS
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 6, 8, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 32px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+/* Form fields inside modals */
+#registerForm label,
+#lookupForm label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  margin-top: 14px;
+}
+
+#registerForm input,
+#lookupForm input {
+  width: 100%;
+  background: var(--bg-page);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+#registerForm input:focus,
+#lookupForm input:focus {
+  outline: none;
+  border-color: var(--accent-glow);
+}
+
+.error-msg {
+  color: #e0707c;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ============================================
+   MY REGISTRATIONS LIST
+   ============================================ */
+.my-reg-list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.my-reg-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-page);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.my-reg-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.my-reg-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 32px;
+  }
+  .events-grid {
+    grid-template-columns: 1fr;
+  }
+}

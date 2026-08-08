@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eventra — Event Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="logo">Eventra</h1>
+      <button id="myRegistrationsBtn" class="btn btn-ghost">My registrations</button>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Browse & register</p>
+      <h2 class="hero-title">Find your next event.<br>Save your seat.</h2>
+      <p class="hero-sub">Every listing below is live — capacity updates the moment someone registers.</p>
+    </div>
+  </section>
+
+  <!-- ===== EVENTS LIST ===== -->
+  <main class="events-section">
+    <div class="events-inner">
+      <h3 class="section-label">Upcoming events</h3>
+      <div id="eventsGrid" class="events-grid">
+        <!-- Event cards get inserted here by JavaScript -->
+        <p id="loadingMsg" class="status-msg">Loading events...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== REGISTRATION MODAL ===== -->
+  <div id="registerModal" class="modal-overlay hidden">
+    <div class="modal">
+      <button id="closeModalBtn" class="modal-close" aria-label="Close">&times;</button>
+      <p class="eyebrow">Register for</p>
+      <h3 id="modalEventTitle" class="modal-title"></h3>
+
+      <form id="registerForm">
+        <label for="regName">Full name</label>
+        <input type="text" id="regName" required placeholder="Your name" />
+
+        <label for="regEmail">Email</label>
+        <input type="email" id="regEmail" required placeholder="you@example.com" />
+
+        <button type="submit" class="btn btn-primary btn-full">Confirm registration</button>
+      </form>
+
+      <p id="registerError" class="error-msg hidden"></p>
+    </div>
+  </div>
+
+  <!-- ===== MY REGISTRATIONS MODAL ===== -->
+  <div id="myRegModal" class="modal-overlay hidden">
+    <div class="modal">
+      <button id="closeMyRegBtn" class="modal-close" aria-label="Close">&times;</button>
+      <p class="eyebrow">Look up by email</p>
+      <h3 class="modal-title">My registrations</h3>
+
+      <form id="lookupForm">
+        <label for="lookupEmail">Your email</label>
+        <input type="email" id="lookupEmail" required placeholder="you@example.com" />
+        <button type="submit" class="btn btn-primary btn-full">View my registrations</button>
+      </form>
+
+      <div id="myRegList" class="my-reg-list"></div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // STATE
+    // ============================================
+    let currentEventId = null; // tracks which event the registration modal is currently open for
+
+    // ============================================
+    // ELEMENT REFERENCES
+    // ============================================
+    const eventsGrid = document.getElementById('eventsGrid');
+    const loadingMsg = document.getElementById('loadingMsg');
+
+    const registerModal = document.getElementById('registerModal');
+    const modalEventTitle = document.getElementById('modalEventTitle');
+    const registerForm = document.getElementById('registerForm');
+    const registerError = document.getElementById('registerError');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    const myRegModal = document.getElementById('myRegModal');
+    const myRegistrationsBtn = document.getElementById('myRegistrationsBtn');
+    const closeMyRegBtn = document.getElementById('closeMyRegBtn');
+    const lookupForm = document.getElementById('lookupForm');
+    const myRegList = document.getElementById('myRegList');
+
+    // ============================================
+    // FETCH & RENDER EVENTS
+    // ============================================
+    async function loadEvents() {
+      try {
+        const res = await fetch('/api/events');
+        const events = await res.json();
+
+        loadingMsg.remove(); // remove "Loading events..." text
+
+        if (events.length === 0) {
+          eventsGrid.innerHTML = '<p class="status-msg">No events yet. Check back soon.</p>';
+          return;
+        }
+
+        // Build one card per event and insert into the grid
+        events.forEach((event) => {
+          const card = document.createElement('div');
+          card.className = 'event-card';
+
+          const eventDate = new Date(event.date).toLocaleDateString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric'
+          });
+
+          card.innerHTML = `
+            <p class="event-date">${eventDate}</p>
+            <h4 class="event-title">${event.title}</h4>
+            <p class="event-desc">${event.description}</p>
+            <p class="event-location">📍 ${event.location}</p>
+            <div class="capacity-track">
+              <div class="capacity-fill" style="width: 0%"></div>
+            </div>
+            <p class="capacity-label">Loading seats...</p>
+            <button class="btn btn-primary btn-full register-btn">Register</button>
+          `;
+
+          eventsGrid.appendChild(card);
+
+          // Fetch how many people are registered vs capacity, then fill the bar
+          updateCapacityDisplay(event._id, event.capacity, card);
+
+          // Open the registration modal when this card's button is clicked
+          card.querySelector('.register-btn').addEventListener('click', () => {
+            openRegisterModal(event._id, event.title);
+          });
+        });
+
+      } catch (err) {
+        loadingMsg.textContent = 'Failed to load events. Please refresh.';
+      }
+    }
+
+    // Fetches registration count for one event and updates its capacity bar
+    async function updateCapacityDisplay(eventId, capacity, cardEl) {
+      try {
+        const res = await fetch(`/api/events/${eventId}/count`);
+        const data = await res.json();
+
+        const percentFull = Math.min(100, Math.round((data.count / capacity) * 100));
+
+        cardEl.querySelector('.capacity-fill').style.width = `${percentFull}%`;
+        cardEl.querySelector('.capacity-label').textContent =
+          `${data.count} / ${capacity} seats filled`;
+
+        // If full, disable the register button
+        if (data.count >= capacity) {
+          const btn = cardEl.querySelector('.register-btn');
+          btn.textContent = 'Fully booked';
+          btn.disabled = true;
+        }
+      } catch (err) {
+        cardEl.querySelector('.capacity-label').textContent = 'Seats unavailable';
+      }
+    }
+
+    // ============================================
+    // REGISTRATION MODAL
+    // ============================================
+    function openRegisterModal(eventId, eventTitle) {
+      currentEventId = eventId;
+      modalEventTitle.textContent = eventTitle;
+      registerError.classList.add('hidden');
+      registerForm.reset();
+      registerModal.classList.remove('hidden');
+    }
+
+    closeModalBtn.addEventListener('click', () => {
+      registerModal.classList.add('hidden');
+    });
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      registerError.classList.add('hidden');
+
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+
+      try {
+        const res = await fetch(`/api/events/${currentEventId}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Something went wrong');
+        }
+
+        // Success — close modal and refresh the events list to show updated capacity
+        registerModal.classList.add('hidden');
+        eventsGrid.innerHTML = '<p class="status-msg">Loading events...</p>';
+        loadEvents();
+
+      } catch (err) {
+        registerError.textContent = err.message;
+        registerError.classList.remove('hidden');
+      }
+    });
+
+    // ============================================
+    // MY REGISTRATIONS MODAL
+    // ============================================
+    myRegistrationsBtn.addEventListener('click', () => {
+      myRegModal.classList.remove('hidden');
+      myRegList.innerHTML = '';
+    });
+
+    closeMyRegBtn.addEventListener('click', () => {
+      myRegModal.classList.add('hidden');
+    });
+
+    lookupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('lookupEmail').value;
+
+      try {
+        const res = await fetch(`/api/registrations/${email}`);
+        const registrations = await res.json();
+
+        if (registrations.length === 0) {
+          myRegList.innerHTML = '<p class="status-msg">No registrations found for this email.</p>';
+          return;
+        }
+
+        myRegList.innerHTML = ''; // clear previous results
+
+        registrations.forEach((reg) => {
+          const item = document.createElement('div');
+          item.className = 'my-reg-item';
+
+          // reg.eventId is the FULL event object here, thanks to .populate() on the backend
+          const eventTitle = reg.eventId ? reg.eventId.title : 'Event no longer available';
+
+          item.innerHTML = `
+            <div>
+              <p class="my-reg-title">${eventTitle}</p>
+              <p class="my-reg-sub">Registered ${new Date(reg.registeredAt).toLocaleDateString()}</p>
+            </div>
+            <button class="btn btn-danger cancel-btn">Cancel</button>
+          `;
+
+          item.querySelector('.cancel-btn').addEventListener('click', async () => {
+            await fetch(`/api/registrations/${reg._id}`, { method: 'DELETE' });
+            item.remove();
+          });
+
+          myRegList.appendChild(item);
+        });
+
+      } catch (err) {
+        myRegList.innerHTML = '<p class="status-msg">Something went wrong. Try again.</p>';
+      }
+    });
+
+    // Kick things off
+    loadEvents();
+  </script>
+
+</body>
+</html>

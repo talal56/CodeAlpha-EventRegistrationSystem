@@ -383,3 +383,114 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* ============================================
+   ADMIN PAGE
+   ============================================ */
+.admin-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-glow);
+  background: rgba(122, 37, 54, 0.15);
+  padding: 3px 8px;
+  border-radius: 5px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.admin-section {
+  padding: 48px 24px 96px;
+}
+
+.admin-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.admin-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 28px;
+}
+
+.admin-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+#createEventForm label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  margin-top: 14px;
+}
+
+#createEventForm input,
+#createEventForm textarea {
+  width: 100%;
+  background: var(--bg-page);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  resize: vertical;
+}
+
+#createEventForm input:focus,
+#createEventForm textarea:focus {
+  outline: none;
+  border-color: var(--accent-glow);
+}
+
+.form-msg {
+  margin-top: 14px;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.form-msg.success {
+  background: rgba(80, 160, 100, 0.12);
+  color: #7fce9a;
+}
+
+.form-msg.error {
+  background: rgba(200, 70, 80, 0.12);
+  color: #e0707c;
+}
+
+.admin-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-event-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-page);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.admin-event-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.admin-event-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}

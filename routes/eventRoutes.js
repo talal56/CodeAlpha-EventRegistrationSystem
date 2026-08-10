@@ -59,4 +59,24 @@ router.get('/events/:id/count', async (req, res) => {
   }
 });
 
+
+router.delete('/events/:id', async (req, res) => {
+  try {
+    const deleted = await Event.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+
+    const Registration = require('../models/Registration');
+    await Registration.deleteMany({ eventId: req.params.id });
+
+    res.json({ message: 'Event deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;

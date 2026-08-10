@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eventra — Admin</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="logo">Eventra <span class="admin-tag">Admin</span></h1>
+      <a href="/" class="btn btn-ghost">Back to events</a>
+    </div>
+  </header>
+
+  <!-- ===== ADMIN FORM SECTION ===== -->
+  <main class="admin-section">
+    <div class="admin-inner">
+
+      <!-- Create event form -->
+      <div class="admin-panel">
+        <p class="eyebrow">Organizer tools</p>
+        <h2 class="admin-title">Create a new event</h2>
+
+        <form id="createEventForm">
+          <label for="title">Event title</label>
+          <input type="text" id="title" required placeholder="e.g. Tech Meetup Abbottabad" />
+
+          <label for="description">Description</label>
+          <textarea id="description" required placeholder="What's this event about?" rows="3"></textarea>
+
+          <label for="date">Date</label>
+          <input type="date" id="date" required />
+
+          <label for="location">Location</label>
+          <input type="text" id="location" required placeholder="e.g. Abbottabad, KPK" />
+
+          <label for="capacity">Capacity</label>
+          <input type="number" id="capacity" required min="1" placeholder="e.g. 30" />
+
+          <button type="submit" class="btn btn-primary btn-full">Create event</button>
+        </form>
+
+        <p id="formMsg" class="form-msg hidden"></p>
+      </div>
+
+      <!-- List of existing events, with delete option -->
+      <div class="admin-panel">
+        <p class="eyebrow">Manage</p>
+        <h2 class="admin-title">Existing events</h2>
+        <div id="adminEventsList" class="admin-events-list">
+          <p class="status-msg">Loading events...</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const createEventForm = document.getElementById('createEventForm');
+    const formMsg = document.getElementById('formMsg');
+    const adminEventsList = document.getElementById('adminEventsList');
+
+    // ============================================
+    // CREATE EVENT
+    // ============================================
+    createEventForm.addEventListener('submit', async (e) => {
+      e.preventDefault(); // stop the page from reloading
+
+      formMsg.classList.add('hidden');
+
+      // Gather all form values into one object
+      const newEvent = {
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        date: document.getElementById('date').value,
+        location: document.getElementById('location').value,
+        capacity: Number(document.getElementById('capacity').value),
+      };
+
+      try {
+        const res = await fetch('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newEvent),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Something went wrong');
+        }
+
+        // Success feedback
+        formMsg.textContent = `"${data.title}" was created successfully.`;
+        formMsg.className = 'form-msg success';
+        formMsg.classList.remove('hidden');
+
+        createEventForm.reset();
+        loadAdminEvents(); // refresh the list below to show the new event
+
+      } catch (err) {
+        formMsg.textContent = err.message;
+        formMsg.className = 'form-msg error';
+        formMsg.classList.remove('hidden');
+      }
+    });
+
+    // ============================================
+    // LOAD & DISPLAY EXISTING EVENTS (with delete button)
+    // ============================================
+    async function loadAdminEvents() {
+      try {
+        const res = await fetch('/api/events');
+        const events = await res.json();
+
+        if (events.length === 0) {
+          adminEventsList.innerHTML = '<p class="status-msg">No events created yet.</p>';
+          return;
+        }
+
+        adminEventsList.innerHTML = ''; // clear previous list
+
+        events.forEach((event) => {
+          const eventDate = new Date(event.date).toLocaleDateString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric'
+          });
+
+          const item = document.createElement('div');
+          item.className = 'admin-event-item';
+          item.innerHTML = `
+            <div>
+              <p class="admin-event-title">${event.title}</p>
+              <p class="admin-event-meta">${eventDate} · ${event.location} · Capacity: ${event.capacity}</p>
+            </div>
+            <button class="btn btn-danger delete-btn">Delete</button>
+          `;
+
+          // Delete button wiring
+          item.querySelector('.delete-btn').addEventListener('click', async () => {
+            const confirmed = confirm(`Delete "${event.title}"? This cannot be undone.`);
+            if (!confirmed) return;
+
+            await fetch(`/api/events/${event._id}`, { method: 'DELETE' });
+            item.remove();
+          });
+
+          adminEventsList.appendChild(item);
+        });
+
+      } catch (err) {
+        adminEventsList.innerHTML = '<p class="status-msg">Failed to load events.</p>';
+      }
+    }
+
+    // Load the events list as soon as the page opens
+    loadAdminEvents();
+  </script>
+
+</body>
+</html>

@@ -10,7 +10,7 @@
 </head>
 <body>
 
-  <!-- ===== HEADER ===== -->
+  
   <header class="site-header">
     <div class="header-inner">
       <h1 class="logo">Eventra</h1>
@@ -20,7 +20,7 @@
     </div>
   </header>
 
-  <!-- ===== HERO ===== -->
+  
   <section class="hero">
     <div class="hero-inner">
       <p class="eyebrow">Browse & register</p>
@@ -61,7 +61,7 @@
     </div>
   </div>
 
-  <!-- ===== MY REGISTRATIONS MODAL ===== -->
+ 
   <div id="myRegModal" class="modal-overlay hidden">
     <div class="modal">
       <button id="closeMyRegBtn" class="modal-close" aria-label="Close">&times;</button>
@@ -79,14 +79,10 @@
   </div>
 
   <script>
-    // ============================================
-    // STATE
-    // ============================================
-    let currentEventId = null; // tracks which event the registration modal is currently open for
 
-    // ============================================
-    // ELEMENT REFERENCES
-    // ============================================
+    let currentEventId = null; 
+
+    
     const eventsGrid = document.getElementById('eventsGrid');
     const loadingMsg = document.getElementById('loadingMsg');
 
@@ -102,9 +98,6 @@
     const lookupForm = document.getElementById('lookupForm');
     const myRegList = document.getElementById('myRegList');
 
-    // ============================================
-    // FETCH & RENDER EVENTS
-    // ============================================
     async function loadEvents() {
       try {
         const res = await fetch('/api/events');
@@ -117,7 +110,7 @@
           return;
         }
 
-        // Build one card per event and insert into the grid
+        
         events.forEach((event) => {
           const card = document.createElement('div');
           card.className = 'event-card';
@@ -140,10 +133,9 @@
 
           eventsGrid.appendChild(card);
 
-          // Fetch how many people are registered vs capacity, then fill the bar
+          
           updateCapacityDisplay(event._id, event.capacity, card);
 
-          // Open the registration modal when this card's button is clicked
           card.querySelector('.register-btn').addEventListener('click', () => {
             openRegisterModal(event._id, event.title);
           });
@@ -154,7 +146,6 @@
       }
     }
 
-    // Fetches registration count for one event and updates its capacity bar
     async function updateCapacityDisplay(eventId, capacity, cardEl) {
       try {
         const res = await fetch(`/api/events/${eventId}/count`);
@@ -166,7 +157,7 @@
         cardEl.querySelector('.capacity-label').textContent =
           `${data.count} / ${capacity} seats filled`;
 
-        // If full, disable the register button
+       
         if (data.count >= capacity) {
           const btn = cardEl.querySelector('.register-btn');
           btn.textContent = 'Fully booked';
@@ -177,9 +168,6 @@
       }
     }
 
-    // ============================================
-    // REGISTRATION MODAL
-    // ============================================
     function openRegisterModal(eventId, eventTitle) {
       currentEventId = eventId;
       modalEventTitle.textContent = eventTitle;
@@ -212,7 +200,7 @@
           throw new Error(data.error || 'Something went wrong');
         }
 
-        // Success — close modal and refresh the events list to show updated capacity
+       
         registerModal.classList.add('hidden');
         eventsGrid.innerHTML = '<p class="status-msg">Loading events...</p>';
         loadEvents();
@@ -223,9 +211,7 @@
       }
     });
 
-    // ============================================
-    // MY REGISTRATIONS MODAL
-    // ============================================
+
     myRegistrationsBtn.addEventListener('click', () => {
       myRegModal.classList.remove('hidden');
       myRegList.innerHTML = '';

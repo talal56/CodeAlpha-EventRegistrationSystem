@@ -11,7 +11,7 @@
 </head>
 <body>
 
-  <!-- ===== HEADER ===== -->
+
   <header class="site-header">
     <div class="header-inner">
       <h1 class="logo">Eventra <span class="admin-tag">Admin</span></h1>
@@ -19,7 +19,7 @@
     </div>
   </header>
 
-  <!-- ===== ADMIN FORM SECTION ===== -->
+  
   <main class="admin-section">
     <div class="admin-inner">
 
@@ -67,9 +67,7 @@
     const formMsg = document.getElementById('formMsg');
     const adminEventsList = document.getElementById('adminEventsList');
 
-    // ============================================
-    // CREATE EVENT
-    // ============================================
+   
     createEventForm.addEventListener('submit', async (e) => {
       e.preventDefault(); // stop the page from reloading
 
@@ -97,7 +95,7 @@
           throw new Error(data.error || 'Something went wrong');
         }
 
-        // Success feedback
+    
         formMsg.textContent = `"${data.title}" was created successfully.`;
         formMsg.className = 'form-msg success';
         formMsg.classList.remove('hidden');
@@ -112,9 +110,7 @@
       }
     });
 
-    // ============================================
-    // LOAD & DISPLAY EXISTING EVENTS (with delete button)
-    // ============================================
+   
     async function loadAdminEvents() {
       try {
         const res = await fetch('/api/events');
@@ -125,7 +121,7 @@
           return;
         }
 
-        adminEventsList.innerHTML = ''; // clear previous list
+        adminEventsList.innerHTML = ''; 
 
         events.forEach((event) => {
           const eventDate = new Date(event.date).toLocaleDateString('en-US', {
@@ -159,7 +155,7 @@
       }
     }
 
-    // Load the events list as soon as the page opens
+    
     loadAdminEvents();
   </script>
 

@@ -50,7 +50,7 @@ router.get('/events/:id', async (req, res) => {
 
 router.get('/events/:id/count', async (req, res) => {
   try {
-    const Registration = require('../models/Registration'); // imported here to avoid circular require issues
+    const Registration = require('../models/Registration'); 
     const count = await Registration.countDocuments({ eventId: req.params.id });
     res.json({ count });
   } catch (err) {

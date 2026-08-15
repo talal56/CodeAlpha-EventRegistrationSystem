@@ -69,11 +69,11 @@
 
    
     createEventForm.addEventListener('submit', async (e) => {
-      e.preventDefault(); // stop the page from reloading
+      e.preventDefault(); 
 
       formMsg.classList.add('hidden');
 
-      // Gather all form values into one object
+      
       const newEvent = {
         title: document.getElementById('title').value,
         description: document.getElementById('description').value,
@@ -101,7 +101,7 @@
         formMsg.classList.remove('hidden');
 
         createEventForm.reset();
-        loadAdminEvents(); // refresh the list below to show the new event
+        loadAdminEvents();
 
       } catch (err) {
         formMsg.textContent = err.message;
@@ -138,7 +138,7 @@
             <button class="btn btn-danger delete-btn">Delete</button>
           `;
 
-          // Delete button wiring
+          
           item.querySelector('.delete-btn').addEventListener('click', async () => {
             const confirmed = confirm(`Delete "${event.title}"? This cannot be undone.`);
             if (!confirmed) return;

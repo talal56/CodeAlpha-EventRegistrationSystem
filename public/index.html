@@ -29,7 +29,7 @@
     </div>
   </section>
 
-  <!-- ===== EVENTS LIST ===== -->
+ 
   <main class="events-section">
     <div class="events-inner">
       <h3 class="section-label">Upcoming events</h3>
@@ -40,7 +40,7 @@
     </div>
   </main>
 
-  <!-- ===== REGISTRATION MODAL ===== -->
+ 
   <div id="registerModal" class="modal-overlay hidden">
     <div class="modal">
       <button id="closeModalBtn" class="modal-close" aria-label="Close">&times;</button>
@@ -103,7 +103,7 @@
         const res = await fetch('/api/events');
         const events = await res.json();
 
-        loadingMsg.remove(); // remove "Loading events..." text
+        loadingMsg.remove(); 
 
         if (events.length === 0) {
           eventsGrid.innerHTML = '<p class="status-msg">No events yet. Check back soon.</p>';
@@ -240,7 +240,7 @@
           const item = document.createElement('div');
           item.className = 'my-reg-item';
 
-          // reg.eventId is the FULL event object here, thanks to .populate() on the backend
+         
           const eventTitle = reg.eventId ? reg.eventId.title : 'Event no longer available';
 
           item.innerHTML = `
@@ -264,7 +264,7 @@
       }
     });
 
-    // Kick things off
+    
     loadEvents();
   </script>
 
